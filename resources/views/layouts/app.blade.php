@@ -1,3 +1,5 @@
+@props(['hideNavigation' => false])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -16,7 +18,9 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+            @unless($hideNavigation)
+                @include('layouts.navigation')
+            @endunless
 
             <!-- Page Heading -->
             @isset($header)
@@ -32,5 +36,6 @@
                 {{ $slot }}
             </main>
         </div>
+        @include('components.live-clock')
     </body>
 </html>

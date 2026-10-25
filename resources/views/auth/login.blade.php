@@ -11,7 +11,7 @@
                     <div class="w-8 h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-white font-black text-sm shadow-sm">
                         🌱
                     </div>
-                    <span class="text-xl font-black text-slate-900 tracking-tight">SurplusBite</span>
+                    <span class="text-xl font-black text-slate-900 tracking-tight">Save Bite</span>
                 </div>
 
                 <!-- Title Header -->
@@ -26,7 +26,7 @@
                 <!-- Login Form -->
                 <form method="POST" action="{{ route('login') }}" class="space-y-5">
                     @csrf
-                    <input type="hidden" name="redirect" value="{{ request()->query('redirect', route('dashboard', absolute: false)) }}">
+                    <input type="hidden" name="redirect" value="{{ request()->query('redirect', route('home', absolute: false)) }}">
 
                     <!-- Email Input -->
                     <div class="space-y-1">
@@ -46,13 +46,16 @@
                     <!-- Password Input -->
                     <div class="space-y-1">
                         <label for="password" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Password</label>
-                        <input id="password" 
-                               type="password" 
-                               name="password" 
-                               required 
-                               autocomplete="current-password"
-                               placeholder="••••••••"
-                               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                           <div class="relative">
+                            <input id="password" 
+                                type="password" 
+                                name="password" 
+                                required 
+                                autocomplete="current-password"
+                                placeholder="••••••••"
+                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-16 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                            <button type="button" data-toggle-password="password" class="absolute inset-y-0 right-3 text-xs font-bold text-slate-400 hover:text-emerald-700" aria-label="Lihat password">Lihat</button>
+                           </div>
                         <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs text-red-500" />
                     </div>
 
@@ -83,6 +86,18 @@
                         </a>
                     </div>
                 </form>
+                <script>
+                    document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+                        button.addEventListener('click', () => {
+                            const input = document.getElementById(button.dataset.togglePassword);
+                            const visible = input.type === 'text';
+                            input.type = visible ? 'password' : 'text';
+                            button.textContent = visible ? 'Lihat' : 'Sembunyikan';
+                            button.setAttribute('aria-label', visible ? 'Lihat password' : 'Sembunyikan password');
+                        });
+                    });
+                </script>
+                <a href="{{ route('google.redirect', ['redirect' => request()->query('redirect')]) }}" class="mt-4 flex w-full items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700">Masuk dengan Google</a>
             </div>
 
             <!-- Policy Footer -->
@@ -106,7 +121,7 @@
         <div class="relative hidden md:block bg-emerald-950 overflow-hidden">
             <!-- Background Image -->
             <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=1200&q=80" 
-                 alt="Nature Eco SurplusBite" 
+                 alt="Nature Eco Save Bite"
                  class="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105">
 
             <!-- Dark Vignette Overlay -->

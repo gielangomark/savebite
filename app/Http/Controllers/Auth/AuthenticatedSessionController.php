@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -24,21 +25,19 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
+        $user = Auth::user();
+        Auth::logout();
+        app(OtpController::class)->issue($user, $request);
+        $request->session()->put([
+            'otp_redirect' => $request->input('redirect', route('home')),
+            'otp_remember' => $request->boolean('remember'),
+        ]);
+        $request->session()->save();
 
-        $request->session()->regenerate();
-
-        // Mengubah fallback route default dari 'dashboard' ke 'home'
-        $redirectTo = $request->input('redirect', route('home', absolute: false));
-
-        // Jika user adalah merchant dan tidak sedang mengakses link redirect khusus
-        if (method_exists(Auth::user(), 'isMerchant') && Auth::user()->isMerchant() && !$request->has('redirect')) {
-            return redirect()->intended(route('merchant.dashboard', absolute: false));
-        }
-
-        return redirect()->intended($redirectTo);
+        return view('auth.otp');
     }
 
     /**
@@ -54,4 +53,4 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
-} Everything pro
+}

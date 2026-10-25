@@ -11,7 +11,7 @@
                     <div class="w-8 h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-white font-black text-sm shadow-sm">
                         🌱
                     </div>
-                    <span class="text-xl font-black text-slate-900 tracking-tight">SurplusBite</span>
+                    <span class="text-xl font-black text-slate-900 tracking-tight">Save Bite</span>
                 </div>
 
                 <!-- Title Header -->
@@ -23,11 +23,28 @@
                 <!-- Register Form -->
                 <form method="POST" action="{{ route('register') }}" class="space-y-4">
                     @csrf
-                    <input type="hidden" name="redirect" value="{{ request()->query('redirect', route('dashboard', absolute: false)) }}">
+                    <input type="hidden" name="redirect" value="{{ request()->query('redirect', route('home', absolute: false)) }}">
 
-                    <!-- Name Input -->
+                    <!-- Register As (Role Selection) -->
+                    <div class="space-y-1.5 pt-1">
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Register as</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 cursor-pointer hover:border-emerald-500 transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
+                                <input type="radio" name="role" value="student" {{ old('role', 'student') === 'student' ? 'checked' : '' }} class="w-4 h-4 text-emerald-800 focus:ring-emerald-600 cursor-pointer role-radio">
+                                <span class="text-xs font-bold text-slate-700">🎓 Buyer</span>
+                            </label>
+
+                            <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 cursor-pointer hover:border-emerald-500 transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
+                                <input type="radio" name="role" value="merchant" {{ old('role') === 'merchant' ? 'checked' : '' }} class="w-4 h-4 text-emerald-800 focus:ring-emerald-600 cursor-pointer role-radio">
+                                <span class="text-xs font-bold text-slate-700">🏪 Merchant</span>
+                            </label>
+                        </div>
+                        <x-input-error :messages="$errors->get('role')" class="mt-1 text-xs text-red-500" />
+                    </div>
+
+                    <!-- Dynamic Name / Store Name Input -->
                     <div class="space-y-1">
-                        <label for="name" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Full Name</label>
+                        <label for="name" id="name-label" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Full Name</label>
                         <input id="name" 
                                type="text" 
                                name="name" 
@@ -54,48 +71,53 @@
                         <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs text-red-500" />
                     </div>
 
+                    <!-- WhatsApp Number Input -->
+                    <div class="space-y-1">
+                        <label for="phone" id="phone-label" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nomor WhatsApp</label>
+                        <input id="phone"
+                               type="tel"
+                               name="phone"
+                               value="{{ old('phone') }}"
+                               required
+                               inputmode="tel"
+                               autocomplete="tel"
+                               placeholder="Contoh: 081234567890"
+                               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                        <p id="phone-help" class="text-[10px] text-slate-400">Dipakai untuk informasi pesanan Anda.</p>
+                        <x-input-error :messages="$errors->get('phone')" class="mt-1 text-xs text-red-500" />
+                    </div>
+
                     <!-- Password & Confirm Password Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <label for="password" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Password</label>
-                            <input id="password" 
-                                   type="password" 
-                                   name="password" 
-                                   required 
-                                   autocomplete="new-password"
-                                   placeholder="••••••••"
-                                   class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                            <div class="relative">
+                                <input id="password" 
+                                    type="password" 
+                                    name="password" 
+                                    required 
+                                    autocomplete="new-password"
+                                    placeholder="••••••••"
+                                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 pr-14 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                                <button type="button" data-toggle-password="password" class="absolute inset-y-0 right-2 text-[10px] font-bold text-slate-400 hover:text-emerald-700" aria-label="Lihat password">Lihat</button>
+                            </div>
                             <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs text-red-500" />
                         </div>
 
                         <div class="space-y-1">
                             <label for="password_confirmation" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Confirm</label>
-                            <input id="password_confirmation" 
-                                   type="password" 
-                                   name="password_confirmation" 
-                                   required 
-                                   autocomplete="new-password"
-                                   placeholder="••••••••"
-                                   class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                            <div class="relative">
+                                <input id="password_confirmation" 
+                                    type="password" 
+                                    name="password_confirmation" 
+                                    required 
+                                    autocomplete="new-password"
+                                    placeholder="••••••••"
+                                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 pr-14 text-sm font-medium text-slate-800 placeholder-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition outline-none" />
+                                <button type="button" data-toggle-password="password_confirmation" class="absolute inset-y-0 right-2 text-[10px] font-bold text-slate-400 hover:text-emerald-700" aria-label="Lihat password">Lihat</button>
+                            </div>
                             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-xs text-red-500" />
                         </div>
-                    </div>
-
-                    <!-- Register As (Role Selection) -->
-                    <div class="space-y-1.5 pt-1">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Register as</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 cursor-pointer hover:border-emerald-500 transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
-                                <input type="radio" name="role" value="student" checked class="w-4 h-4 text-emerald-800 focus:ring-emerald-600 cursor-pointer">
-                                <span class="text-xs font-bold text-slate-700">🎓 Buyer</span>
-                            </label>
-
-                            <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 cursor-pointer hover:border-emerald-500 transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
-                                <input type="radio" name="role" value="merchant" class="w-4 h-4 text-emerald-800 focus:ring-emerald-600 cursor-pointer">
-                                <span class="text-xs font-bold text-slate-700">🏪 Merchant</span>
-                            </label>
-                        </div>
-                        <x-input-error :messages="$errors->get('role')" class="mt-1 text-xs text-red-500" />
                     </div>
 
                     <!-- Buttons Row: Sign up & Login -->
@@ -111,6 +133,17 @@
                         </a>
                     </div>
                 </form>
+                <script>
+                    document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+                        button.addEventListener('click', () => {
+                            const input = document.getElementById(button.dataset.togglePassword);
+                            const visible = input.type === 'text';
+                            input.type = visible ? 'password' : 'text';
+                            button.textContent = visible ? 'Lihat' : 'Sembunyikan';
+                            button.setAttribute('aria-label', visible ? 'Lihat password' : 'Sembunyikan password');
+                        });
+                    });
+                </script>
             </div>
 
             <!-- Policy Footer -->
@@ -133,7 +166,7 @@
         <!-- RIGHT COLUMN: Nature & Bird Visual Banner -->
         <div class="relative hidden md:block bg-emerald-950 overflow-hidden">
             <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=1200&q=80" 
-                 alt="Nature Eco SurplusBite" 
+                 alt="Nature Eco Save Bite"
                  class="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105">
 
             <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-transparent to-black/20"></div>
@@ -157,4 +190,30 @@
         </div>
 
     </div>
+
+    <!-- Script Dynamic Role Switcher -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleRadios = document.querySelectorAll('.role-radio');
+            const nameLabel = document.getElementById('name-label');
+            const nameInput = document.getElementById('name');
+            const phoneHelp = document.getElementById('phone-help');
+
+            function updateNameField() {
+                const selectedRole = document.querySelector('.role-radio:checked')?.value;
+                if (selectedRole === 'merchant') {
+                    nameLabel.textContent = 'Nama Usaha / Toko';
+                    nameInput.placeholder = 'Contoh: Warung Barokah / Resto Jaya';
+                    phoneHelp.textContent = 'Nomor ini akan menjadi WhatsApp toko untuk dihubungi pembeli dari tiket.';
+                } else {
+                    nameLabel.textContent = 'Full Name';
+                    nameInput.placeholder = 'Full name';
+                    phoneHelp.textContent = 'Dipakai untuk informasi pesanan Anda.';
+                }
+            }
+
+            roleRadios.forEach(radio => radio.addEventListener('change', updateNameField));
+            updateNameField(); // Jalankan saat awal render halaman
+        });
+    </script>
 </x-guest-layout>

@@ -13,8 +13,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'avatar',
         'password',
         'role', // Tambahkan kolom ini
+        'google_id',
+        'timezone',
     ];
 
     protected $hidden = [
@@ -39,5 +43,24 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+
+    public function wallet() { return $this->morphOne(Wallet::class, 'owner'); }
+    public function merchant() { return $this->hasOne(Merchant::class); }
+
+    public function setPhoneAttribute(?string $phone): void
+    {
+        $this->attributes['phone'] = $phone === null ? null : static::normalizePhone($phone);
+    }
+
+    public static function normalizePhone(string $phone): string
+    {
+        $number = preg_replace('/\D+/', '', $phone);
+
+        if (str_starts_with($number, '0')) {
+            return '62' . substr($number, 1);
+        }
+
+        return str_starts_with($number, '62') ? $number : '62' . $number;
     }
 }

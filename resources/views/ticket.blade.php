@@ -19,8 +19,8 @@
             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto text-2xl mb-2 backdrop-blur-md animate-bounce">
                 🎉
             </div>
-            <h1 class="text-xl font-black">Booking Berhasil!</h1>
-            <p class="text-xs text-emerald-100 mt-1">Tunjukkan tiket ini kepada pengelola kantin.</p>
+            <h1 class="text-xl font-black">Tiket Pesanan</h1>
+            <p class="text-xs text-emerald-100 mt-1">Tunjukkan QR code ini kepada pengelola kantin.</p>
         </div>
 
         <!-- Ticket Body dengan Notch Potongan Struk -->
@@ -29,6 +29,11 @@
                 <span class="text-[10px] text-emerald-700 uppercase font-black tracking-widest">KODE BOOKING UNIK</span>
                 <p class="text-3xl font-black text-emerald-800 tracking-wider my-1">{{ $order->booking_code }}</p>
                 <span class="text-xs text-slate-500">Pemesan: <b>{{ $order->customer_name }}</b></span>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center">
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Scan QR Code</p>
+                <canvas id="ticket-qr" class="mx-auto block rounded-xl bg-white p-2 shadow-sm"></canvas>
             </div>
 
             <div class="border-t border-dashed border-slate-200 pt-4 text-xs space-y-2.5">
@@ -55,17 +60,48 @@
             </div>
 
             <!-- Action Button WhatsApp -->
-            <a href="https://wa.me/{{ $order->product->merchant->whatsapp }}?text=Halo%20{{ urlencode($order->product->merchant->name) }},%20saya%20mau%20konfirmasi%20booking%20makanan%20dengan%20kode%20{{ $order->booking_code }}" 
+            <a href="https://wa.me/{{ $order->product->merchant->whatsappNumber() }}?text=Halo%20{{ urlencode($order->product->merchant->name) }},%20saya%20mau%20konfirmasi%20booking%20makanan%20dengan%20kode%20{{ $order->booking_code }}" 
                target="_blank"
                class="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black py-4 rounded-2xl shadow-lg shadow-emerald-600/30 transition transform active:scale-95">
                <span>💬 Chat WhatsApp Merchant</span>
             </a>
 
-            <a href="{{ route('home') }}" class="block text-center text-xs text-slate-400 hover:text-slate-600">
-                &larr; Kembali ke Katalog Utama
+            @if($order->status === 'ready_for_pickup')
+                <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('Batalkan pesanan? Refund akan masuk ke saldo Save Bite.');">@csrf
+                    <button class="w-full rounded-2xl border border-rose-200 bg-rose-50 py-3 text-xs font-black text-rose-600">Batalkan & refund ke saldo</button>
+                </form>
+            @endif
+
+            <a href="{{ route('orders.history') }}" class="flex items-center justify-center w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-black py-3.5 rounded-2xl transition">
+                Lihat Riwayat Pesanan &rarr;
             </a>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const qrCanvas = document.getElementById('ticket-qr');
+            const bookingCode = @json($order->booking_code);
+
+            if (qrCanvas && window.QRCode) {
+                QRCode.toCanvas(qrCanvas, bookingCode, {
+                    width: 170,
+                    margin: 1,
+                    color: {
+                        dark: '#0f172a',
+                        light: '#ffffff'
+                    }
+                }, function (error) {
+                    if (error) {
+                        console.error('QR generate error:', error);
+                    }
+                });
+            }
+
+        });
+    </script>
+
+@include('components.live-clock')
 </body>
 </html>
